@@ -14,7 +14,7 @@ This folder is configured for deployment on Render.
     *   If not, manually set:
         *   **Runtime**: Python 3
         *   **Build Command**: `pip install -r requirements.txt`
-        *   **Start Command**: `gunicorn backend.app:app`
+        *   **Start Command**: `gunicorn --chdir backend app:app`
 5.  **Deploy**: Click "Create Web Service".
 
 ## Important Notes
