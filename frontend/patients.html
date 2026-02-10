@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareLink AI - Patients</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">CareLink AI</div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span id="userRoleDisplay" class="text-muted" style="font-size: 0.9rem;">Logged in as Doctor</span>
+                <a href="index.html" class="btn btn-secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.8rem;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h2>Patient List (Active Monitoring)</h2>
+            <div style="display: flex; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="status-indicator status-normal"></span> Normal
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="status-indicator status-danger"></span> High Risk
+                </div>
+            </div>
+        </div>
+
+        <div class="grid-3" id="patientsGrid">
+            <!-- Patient cards will be injected here by JS -->
+            <div class="card" style="text-align: center; padding: 3rem;">
+                <p class="text-muted">Loading patient data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set user role display
+        document.getElementById('userRoleDisplay').innerText = 'Logged in as ' + (localStorage.getItem('userRole') || 'User').toUpperCase();
+    </script>
+</body>
+
+</html>

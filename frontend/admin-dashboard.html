@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CareLink AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="h-full bg-slate-900 text-slate-100">
+    <div id="app" class="h-full flex flex-col">
+        <!-- Header -->
+        <header class="bg-slate-800 border-b border-slate-700 sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                        <span class="text-xl font-bold text-white">⚡</span>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-white text-lg tracking-wide">System Admin</h1>
+                        <p class="text-xs text-slate-400">CareLink Platform Oversight</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span
+                        class="flex items-center gap-2 text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        SYSTEM ONLINE
+                    </span>
+                    <button onclick="logout()" class="text-slate-400 hover:text-white transition">Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 w-full max-w-7xl mx-auto px-6 py-8 overflow-y-auto">
+
+            <!-- System Stats -->
+            <div class="grid grid-cols-4 gap-6 mb-8 fade-in">
+                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-2">Total Users</p>
+                    <p class="text-3xl font-bold text-white" id="total-users">-</p>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-2">Active Patients</p>
+                    <p class="text-3xl font-bold text-blue-400" id="total-patients">-</p>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-2">System Alerts</p>
+                    <p class="text-3xl font-bold text-amber-500" id="total-alerts">-</p>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
+                    <p class="text-slate-500 text-xs font-bold uppercase mb-2">Server Status</p>
+                    <p class="text-3xl font-bold text-emerald-500">99.9%</p>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="grid lg:grid-cols-2 gap-8">
+
+                <!-- Recent Alerts Stream -->
+                <div
+                    class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden flex flex-col h-[500px] fade-in">
+                    <div class="p-4 border-b border-slate-700 bg-slate-800/50 flex justify-between items-center">
+                        <h2 class="font-bold text-slate-300">Live Alert Stream</h2>
+                        <span class="text-xs text-slate-500 font-mono">REAL-TIME</span>
+                    </div>
+                    <div id="alert-console"
+                        class="flex-1 overflow-y-auto p-4 space-y-2 font-mono text-sm bg-slate-900/50">
+                        <!-- Alerts Log -->
+                    </div>
+                </div>
+
+                <!-- User Management -->
+                <div class="bg-slate-800 rounded-xl border border-slate-700 overflow-hidden h-[500px] flex flex-col fade-in"
+                    style="animation-delay: 0.1s">
+                    <div class="p-4 border-b border-slate-700 bg-slate-800/50">
+                        <h2 class="font-bold text-slate-300">User Directory</h2>
+                    </div>
+                    <div class="overflow-y-auto flex-1">
+                        <table class="w-full text-left text-sm text-slate-400">
+                            <thead class="bg-slate-700/50 sticky top-0 text-xs uppercase font-semibold text-slate-500">
+                                <tr>
+                                    <th class="px-6 py-3">User</th>
+                                    <th class="px-6 py-3">Role</th>
+                                    <th class="px-6 py-3">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table" class="divide-y divide-slate-700">
+                                <!-- Users -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let token = localStorage.getItem('access_token');
+        let user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'admin') window.location.href = '/index.html';
+
+        async function init() {
+            await Promise.all([fetchUsers(), fetchAlerts()]);
+        }
+
+        async function fetchUsers() {
+            try {
+                const res = await fetch(`${API_URL}/admin/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const users = await res.json();
+
+                document.getElementById('total-users').textContent = users.length;
+                document.getElementById('total-patients').textContent = users.filter(u => u.role === 'patient').length;
+
+                renderUsers(users);
+            } catch (e) { console.error(e); }
+        }
+
+        async function fetchAlerts() {
+            try {
+                const res = await fetch(`${API_URL}/admin/alerts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const alerts = await res.json();
+                document.getElementById('total-alerts').textContent = alerts.length;
+                renderAlertConsole(alerts);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('user-table');
+            tbody.innerHTML = users.map(u => {
+                const roleBadge = u.role === 'admin'
+                    ? 'bg-amber-500/20 text-amber-400 border-amber-500/20'
+                    : u.role === 'doctor'
+                        ? 'bg-blue-500/20 text-blue-400 border-blue-500/20'
+                        : u.role === 'patient'
+                            ? 'bg-purple-500/20 text-purple-400 border-purple-500/20'
+                            : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/20';
+
+                return `
+                <tr class="hover:bg-slate-700/50 transition">
+                    <td class="px-6 py-3 font-medium text-slate-200">
+                        ${u.first_name} ${u.last_name}
+                        <br><span class="text-xs text-slate-500 font-normal">${u.email}</span>
+                    </td>
+                    <td class="px-6 py-3">
+                        <span class="px-2 py-1 rounded text-xs font-bold border ${roleBadge}">${u.role.toUpperCase()}</span>
+                    </td>
+                    <td class="px-6 py-3">
+                        <span class="text-emerald-400 text-xs">● Active</span>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderAlertConsole(alerts) {
+            const consoleDiv = document.getElementById('alert-console');
+            // Show recent alerts first
+            consoleDiv.innerHTML = alerts.slice(0, 30).map(a => `
+                <div class="border-l-2 ${a.severity === 'critical' ? 'border-red-500 text-red-400' : 'border-amber-500 text-amber-400'} pl-3 py-1">
+                    <span class="text-slate-500">[${new Date(a.timestamp).toLocaleTimeString()}]</span>
+                    <span class="font-bold">${a.severity.toUpperCase()}:</span> 
+                    <span class="text-slate-300">${a.message}</span>
+                </div>
+            `).join('');
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+
+        init();
+        setInterval(init, 5000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard - CareLink AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="h-full bg-slate-50">
+    <div id="app" class="h-full flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                        <span class="text-xl">👩‍⚕️</span>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-gray-800 text-lg">Staff Dashboard</h1>
+                        <p class="text-xs text-slate-500" id="staff-welcome">Loading...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="logout()"
+                        class="flex items-center gap-2 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg transition text-sm font-medium">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                            </path>
+                        </svg>
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 w-full max-w-7xl mx-auto px-4 py-8 overflow-y-auto">
+
+            <!-- Alert Management Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 mb-8 overflow-hidden fade-in">
+                <div class="p-5 border-b border-slate-50 flex justify-between items-center bg-red-50/50">
+                    <h2 class="text-lg font-bold text-red-800 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                            </path>
+                        </svg>
+                        Active Alerts
+                    </h2>
+                    <span class="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full"
+                        id="active-alert-count">0</span>
+                </div>
+                <div id="alerts-list" class="divide-y divide-slate-50 max-h-60 overflow-y-auto">
+                    <!-- Alerts injected here -->
+                    <div class="p-8 text-center text-slate-400 text-sm">No active alerts at the moment.</div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-slate-800">All Patients</h2>
+                <div class="relative">
+                    <input type="text" placeholder="Search patients..."
+                        class="pl-10 pr-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 w-64">
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Patient Table -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden fade-in">
+                <table class="w-full text-left text-sm text-slate-600">
+                    <thead class="bg-slate-50 text-xs uppercase font-semibold text-slate-500">
+                        <tr>
+                            <th class="px-6 py-4">Patient</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Heart Rate</th>
+                            <th class="px-6 py-4">SpO2</th>
+                            <th class="px-6 py-4">Temp</th>
+                            <th class="px-6 py-4">Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patient-table-body" class="divide-y divide-slate-50">
+                        <!-- Rows injected here -->
+                    </tbody>
+                </table>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div class="flex flex-col items-center">
+            <div class="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin mb-4">
+            </div>
+            <p class="text-slate-500 font-medium animate-pulse">Loading Patient Data...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let token = localStorage.getItem('access_token');
+        let user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'staff') window.location.href = '/index.html';
+
+        document.getElementById('staff-welcome').textContent = `Nurse ${user.last_name}`;
+
+        async function init() {
+            await fetchPatients();
+            await fetchAlerts();
+            document.getElementById('loading').classList.add('hidden');
+        }
+
+        async function fetchPatients() {
+            try {
+                const res = await fetch(`${API_URL}/staff/patients`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 401) logout();
+
+                const patients = await res.json();
+                renderTable(patients);
+            } catch (e) { console.error(e); }
+        }
+
+        async function fetchAlerts() {
+            try {
+                const res = await fetch(`${API_URL}/staff/alerts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const alerts = await res.json();
+                renderAlerts(alerts);
+            } catch (e) { console.error(e); }
+        }
+
+        function renderTable(patients) {
+            const tbody = document.getElementById('patient-table-body');
+            tbody.innerHTML = patients.map(p => {
+                const trendIcon = p.trend === 'DETERIORATING'
+                    ? `<span class="text-red-500 font-bold">↘ Down</span>`
+                    : p.trend === 'RECOVERING'
+                        ? `<span class="text-emerald-500 font-bold">↗ Up</span>`
+                        : `<span class="text-slate-400">→ Stable</span>`;
+
+                return `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="px-6 py-4 font-medium text-slate-800 flex items-center gap-3">
+                        <div class="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-xs font-bold text-slate-500">
+                            ${p.first_name[0]}${p.last_name[0]}
+                        </div>
+                        ${p.first_name} ${p.last_name}
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-600">Active</span>
+                    </td>
+                    <td class="px-6 py-4 font-bold ${p.heart_rate > 100 ? 'text-red-500' : ''}">${p.heart_rate} bpm</td>
+                    <td class="px-6 py-4 font-bold ${p.spo2 < 95 ? 'text-red-500' : ''}">${p.spo2}%</td>
+                    <td class="px-6 py-4">${p.temperature}°</td>
+                    <td class="px-6 py-4 text-xs">${trendIcon}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderAlerts(alerts) {
+            const list = document.getElementById('alerts-list');
+            document.getElementById('active-alert-count').textContent = alerts.length;
+
+            if (alerts.length === 0) {
+                list.innerHTML = `<div class="p-8 text-center text-slate-400 text-sm">No active alerts at the moment.</div>`;
+                return;
+            }
+
+            list.innerHTML = alerts.map(a => `
+                <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition slide-up">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-red-100 text-red-600 p-2 rounded-full">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-slate-800">${a.type.replace('_', ' ').toUpperCase()}</p>
+                            <p class="text-xs text-slate-500">${a.message} • ${new Date(a.timestamp).toLocaleTimeString()}</p>
+                        </div>
+                    </div>
+                    <button onclick="acknowledgeAlert(${a.id})" class="px-3 py-1 bg-white border border-slate-200 text-slate-600 text-xs rounded hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition">
+                        Acknowledge
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function acknowledgeAlert(id) {
+            await fetch(`${API_URL}/staff/alert/${id}/acknowledge`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            fetchAlerts();
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+
+        // Loop
+        init();
+        setInterval(() => {
+            fetchPatients();
+            fetchAlerts();
+        }, 3000);
+    </script>
+</body>
+
+</html>

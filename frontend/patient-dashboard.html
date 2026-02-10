@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Health - CareLink AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body class="h-full bg-slate-50">
+    <div id="app" class="h-full flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-40">
+            <div class="max-w-md mx-auto px-4 py-4 flex items-center justify-between w-full">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center shadow-md">
+                        <span class="text-xl">❤️</span>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-gray-800 text-lg">My Health</h1>
+                        <p class="text-xs text-slate-500" id="patient-welcome">Loading...</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 w-full max-w-md mx-auto px-4 py-6 overflow-y-auto pb-24">
+
+            <!-- Vitals Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6 fade-in">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Current Vitals</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-blue-50 rounded-xl p-4 text-center">
+                        <div class="text-blue-500 mb-1">
+                            <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
+                                </path>
+                            </svg>
+                        </div>
+                        <p class="text-2xl font-bold text-slate-800" id="vitals-hr">--</p>
+                        <p class="text-xs text-slate-500">BPM</p>
+                    </div>
+                    <div class="bg-emerald-50 rounded-xl p-4 text-center">
+                        <div class="text-emerald-500 mb-1">
+                            <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <p class="text-2xl font-bold text-slate-800" id="vitals-spo2">--</p>
+                        <p class="text-xs text-slate-500">SpO2 %</p>
+                    </div>
+                    <div class="col-span-2 bg-purple-50 rounded-xl p-4 flex items-center justify-between px-8">
+                        <div>
+                            <p class="text-sm text-purple-600 font-bold mb-1">Temperature</p>
+                            <p class="text-3xl font-bold text-slate-800" id="vitals-temp">--</p>
+                        </div>
+                        <div class="text-purple-300">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Status -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-6 fade-in"
+                style="animation-delay: 0.1s">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Health Status</h2>
+                    <span class="px-2 py-1 bg-slate-100 rounded text-xs text-slate-500" id="last-updated">Just
+                        now</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-slate-600">Heart Health</span>
+                            <span class="font-bold text-emerald-500">Good</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-emerald-500 h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="text-slate-600">Activity Level</span>
+                            <span class="font-bold text-blue-500">Normal</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 65%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SOS Button -->
+            <button onclick="triggerSOS()" id="sos-btn"
+                class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white rounded-2xl p-6 shadow-lg shadow-red-200 active:scale-95 transition transform flex items-center justify-center gap-3 mb-6 pulse-glow">
+                <svg class="w-8 h-8 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+                <div>
+                    <span class="block text-2xl font-bold">SOS EMERGENCY</span>
+                    <span class="block text-xs opacity-90 text-red-100">Tap to alert doctor immediately</span>
+                </div>
+            </button>
+
+            <!-- Medications -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 fade-in"
+                style="animation-delay: 0.2s">
+                <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Medications</h2>
+                <div id="medication-list" class="space-y-3">
+                    <div class="text-center text-slate-400 text-sm py-4">No active medications</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- SOS Overlay -->
+    <div id="sos-overlay"
+        class="hidden fixed inset-0 bg-red-600 z-50 flex flex-col items-center justify-center text-white p-8 text-center transition-all duration-300">
+        <div class="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mb-6 animate-ping">
+            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
+                </path>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold mb-2">SOS SENT!</h1>
+        <p class="text-red-100 mb-8">Help is on the way. Your doctor and nearby staff have been notified with your
+            location and vitals.</p>
+        <button onclick="dismissSOS()"
+            class="bg-white text-red-600 px-8 py-3 rounded-xl font-bold hover:bg-red-50 transition">
+            I'm Safe Now
+        </button>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+        let token = localStorage.getItem('access_token');
+        let user = JSON.parse(localStorage.getItem('user') || '{}');
+
+        if (!token || user.role !== 'patient') window.location.href = '/index.html';
+
+        document.getElementById('patient-welcome').textContent = `${user.first_name} ${user.last_name}`;
+
+        async function fetchMyData() {
+            try {
+                const res = await fetch(`${API_URL}/patient/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.status === 401) logout();
+
+                const data = await res.json();
+                updateUI(data);
+                fetchMedications();
+            } catch (e) { console.error(e); }
+        }
+
+        async function fetchMedications() {
+            try {
+                const res = await fetch(`${API_URL}/patient/medications`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const meds = await res.json();
+                renderMeds(meds);
+            } catch (e) { console.error(e); }
+        }
+
+        function updateUI(data) {
+            document.getElementById('vitals-hr').textContent = data.heart_rate;
+            document.getElementById('vitals-spo2').textContent = data.spo2;
+            document.getElementById('vitals-temp').textContent = data.temperature + '°';
+
+            const now = new Date();
+            document.getElementById('last-updated').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function renderMeds(meds) {
+            const list = document.getElementById('medication-list');
+            if (meds.length === 0) return;
+
+            list.innerHTML = meds.map(m => `
+                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-xl shadow-sm">💊</div>
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm">${m.name}</p>
+                            <p class="text-xs text-slate-500">${m.dosage} • ${m.frequency}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function triggerSOS() {
+            const btn = document.getElementById('sos-btn');
+            btn.innerHTML = 'Sending...';
+
+            try {
+                await fetch(`${API_URL}/patient/sos`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                // Show fullscreen overlay
+                document.getElementById('sos-overlay').classList.remove('hidden');
+
+            } catch (e) {
+                alert('Connection failed. Call 911.');
+            } finally {
+                btn.innerHTML = `...`; // Reset text
+            }
+        }
+
+        function dismissSOS() {
+            document.getElementById('sos-overlay').classList.add('hidden');
+            // Reload page to reset state
+            location.reload();
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+
+        fetchMyData();
+        setInterval(fetchMyData, 3000);
+    </script>
+</body>
+
+</html>

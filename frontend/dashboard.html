@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareLink AI - Patient Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="chart.js"></script>
+    <!-- Chart.js for optional graphs, though we focus on live numbers first -->
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">CareLink AI</div>
+            <a href="patients.html" class="btn btn-secondary">← Back to Patient List</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 id="patientName" style="margin-bottom: 0;">Loading...</h1>
+                <p class="text-muted" id="patientId">ID: --</p>
+            </div>
+            <div id="riskBadge" class="card"
+                style="padding: 0.5rem 1.5rem; background: var(--success-color); color: white; border: none;">
+                NORMAL
+            </div>
+        </div>
+
+        <div class="grid-3">
+            <div class="card vital-card">
+                <div class="vital-label">Heart Rate</div>
+                <div class="vital-value" id="hrValue">--</div>
+                <p class="text-muted">bpm</p>
+                <!-- Simple animation or icon -->
+                <div class="status-indicator status-normal" id="hrIndicator"></div>
+            </div>
+
+            <div class="card vital-card">
+                <div class="vital-label">Temperature</div>
+                <div class="vital-value" id="tempValue">--</div>
+                <p class="text-muted">°C</p>
+                <div class="status-indicator status-normal" id="tempIndicator"></div>
+            </div>
+
+            <div class="card vital-card">
+                <div class="vital-label">SpO₂</div>
+                <div class="vital-value" id="spo2Value">--</div>
+                <p class="text-muted">%</p>
+                <div class="status-indicator status-normal" id="spo2Indicator"></div>
+            </div>
+        </div>
+
+        <!-- AI Prediction Section -->
+        <div class="card" style="margin-top: 2rem; border-left: 4px solid var(--primary-color);">
+            <h3>🤖 AI Risk Analysis</h3>
+            <p id="aiAnalysis" class="text-muted">Analyzing real-time patterns...</p>
+            <!-- Digital Twin Controls -->
+            <div class="card" style="margin-top: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2>🧬 Digital Twin Simulation</h2>
+                    <span class="text-muted">Manually trigger future scenarios</span>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                    <button onclick="setTrend('STABLE')" class="btn"
+                        style="background: var(--surface-light); border: 1px solid rgba(255,255,255,0.1);">
+                        Stabilize
+                    </button>
+                    <button onclick="setTrend('DETERIORATING')" class="btn"
+                        style="background: rgba(239, 68, 68, 0.2); border: 1px solid var(--secondary-color); color: var(--secondary-color);">
+                        ⚠️ Simulate Deterioration
+                    </button>
+                    <button onclick="setTrend('RECOVERING')" class="btn"
+                        style="background: rgba(16, 185, 129, 0.2); border: 1px solid var(--success-color); color: var(--success-color);">
+                        ✨ Simulate Recovery
+                    </button>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3>📊 Health Trends</h3>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-sm" id="btnForecast" onclick="toggleChart('forecast')"
+                            style="background: var(--primary-color);">Forecast</button>
+                        <button type="button" class="btn btn-sm" id="btnHistory" onclick="toggleChart('history')"
+                            style="background: var(--surface-light);">History</button>
+                    </div>
+                </div>
+                <div style="height: 300px; position: relative;">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
